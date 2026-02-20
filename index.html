@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product showcase · light/dark + smooth animations</title>
+  <style>
+    /* CSS RESET & BASE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    /* theme variables – light by default */
+    :root {
+      --bg-gradient-start: #f0f4fa;
+      --bg-gradient-end: #d9e2ef;
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --card-glass: rgba(255, 255, 255, 0.4);
+      --text-primary: #1e293b;
+      --text-secondary: #334155;
+      --price-color: #2563eb;
+      --button-bg: #ffffff;
+      --button-border: #cbd5e1;
+      --button-hover: #e2e8f0;
+      --shadow: 0 20px 30px -10px rgba(0, 20, 40, 0.2);
+      --backdrop-blur: 8px;
+      --toggle-sun: none;
+      --toggle-moon: block;
+      --card-border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    /* dark theme overrides – applied when .dark-theme on body */
+    body.dark-theme {
+      --bg-gradient-start: #0b1120;
+      --bg-gradient-end: #1a2639;
+      --card-bg: rgba(20, 30, 45, 0.7);
+      --card-glass: rgba(10, 20, 30, 0.5);
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --price-color: #a78bfa;
+      --button-bg: #1e293b;
+      --button-border: #3b4a5e;
+      --button-hover: #2d3b4f;
+      --shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.6);
+      --toggle-sun: block;
+      --toggle-moon: none;
+      --card-border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      transition: background 0.4s ease, color 0.2s ease;
+      padding: 1rem;
+      margin: 0;
+    }
+
+    /* gallery container with fade-in animation on load */
+    .gallery {
+      max-width: 1200px;
+      width: 100%;
+      padding: 2rem 1.5rem;
+      border-radius: 3rem;
+      background: var(--card-glass);
+      backdrop-filter: blur(var(--backdrop-blur));
+      box-shadow: var(--shadow);
+      border: var(--card-border);
+      animation: galleryFadeIn 0.8s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    }
+
+    @keyframes galleryFadeIn {
+      0% { opacity: 0; transform: scale(0.96) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* header + toggle */
+    .gallery-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .gallery-header h1 {
+      font-size: 2.2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      transition: color 0.3s;
+      border-left: 6px solid var(--price-color);
+      padding-left: 1.2rem;
+    }
+
+    /* theme toggle switch (soft, animated) */
+    .theme-toggle {
+      background: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 60px;
+      padding: 0.4rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+      backdrop-filter: blur(4px);
+    }
+
+    .theme-btn {
+      border: none;
+      background: transparent;
+      font-size: 1.4rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .theme-btn .icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    /* active state on light/dark buttons */
+    .theme-btn.light-active {
+      background: white;
+      color: #1e293b;
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    body.dark-theme .theme-btn.dark-active {
+      background: #2d3b4f;
+      color: white;
+      border-color: #5f7a9a;
+      box-shadow: 0 4px 12px #0f172a;
+    }
+
+    /* hide inactive toggle icon (optional: sun/moon appear) */
+    .theme-btn .sun-icon { display: var(--toggle-sun); }
+    .theme-btn .moon-icon { display: var(--toggle-moon); }
+
+    /* product grid – 3 cards */
+    .card-grid {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .product-card {
+      flex: 1 1 260px;
+      max-width: 320px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 1.8rem 1.5rem 2rem;
+      box-shadow: 0 20px 30px -10px rgba(0,0,0,0.15);
+      border: var(--card-border);
+      transition: transform 0.3s ease, box-shadow 0.4s, background 0.3s, border 0.2s;
+      animation: cardAppear 0.6s ease forwards;
+      opacity: 0;  /* overwritten by animation */
+      transform-origin: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 30px 40px -8px rgba(0,0,0,0.3);
+      border-color: var(--price-color);
+    }
+
+    /* staggered fade-in for cards */
+    .product-card:nth-child(1) { animation-delay: 0.1s; }
+    .product-card:nth-child(2) { animation-delay: 0.2s; }
+    .product-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes cardAppear {
+      0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* image placeholder (icon representation) */
+    .card-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(135deg, var(--price-color), color-mix(in srgb, var(--price-color) 70%, white));
+      border-radius: 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.8rem;
+      margin-bottom: 1.5rem;
+      transition: border-radius 0.3s, background 0.3s;
+      box-shadow: inset 0 -2px 10px rgba(0,0,0,0.1), 0 8px 12px rgba(0,0,0,0.1);
+    }
+
+    .product-card:hover .card-image {
+      border-radius: 2.2rem;
+    }
+
+    /* product title */
+    .product-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.3rem;
+      transition: color 0.2s;
+    }
+
+    .product-description {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 1.2rem;
+      transition: color 0.2s;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+
+    .price {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--price-color);
+      transition: color 0.2s;
+    }
+
+    .buy-btn {
+      background: var(--button-bg);
+      border: 1px solid var(--button-border);
+      color: var(--text-primary);
+      padding: 0.5rem 1.2rem;
+      border-radius: 3rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: default;   /* not interactive, just style */
+      transition: background 0.2s, border 0.2s, transform 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .product-card:hover .buy-btn {
+      background: var(--price-color);
+      border-color: var(--price-color);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* micro interactions + footer note */
+    .foot-note {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      transition: color 0.2s;
+      border-top: 1px dashed var(--button-border);
+      padding-top: 1.5rem;
+    }
+
+    /* no js fallback – but we use js for toggle */
+    .theme-toggle .theme-btn {
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery">
+    <div class="gallery-header">
+      <h1>✦ edge collection</h1>
+      <!-- theme toggle with two buttons (light / dark) – no frameworks -->
+      <div class="theme-toggle" id="themeToggle">
+        <button class="theme-btn light-active" id="lightModeBtn" aria-label="Light mode">
+          <span class="icon">☀️</span> <span class="sun-icon">Light</span>
+        </button>
+        <button class="theme-btn" id="darkModeBtn" aria-label="Dark mode">
+          <span class="icon">🌙</span> <span class="moon-icon">Dark</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3‑card product showcase -->
+    <div class="card-grid">
+      <!-- card 1 —— wireless headphone -->
+      <div class="product-card">
+        <div class="card-image">🎧</div>
+        <h2 class="product-title">AeroBuds</h2>
+        <p class="product-description">Adaptive noise cancellation · 40h battery · seamless fabric</p>
+        <div class="price-row">
+          <span class="price">$129</span>
+          <span class="buy-btn">shop →</span>
+        </div>
+      </div>
+      <!-- card 2 —— smart watch -->
+      <div class="product-card">
+        <div class="card-image">⌚</div>
+        <h2 class="product-title">Orbit Watch</h2>
+        <p class="product-description">Sapphire glass · sleep & heart · 5ATM titanium</p>
+        <div class="price-row">
+          <span class="price">$249</span>
+          <span class="buy-btn">shop →</span>
+        </div>
+      </div>
+      <!-- card 3 —— minimalist speaker -->
+      <div class="product-card">
+        <div class="card-image">🔊</div>
+        <h2 class="product-title">Echo Stone</h2>
+        <p class="product-description">360° sound · 20W · dustproof · rich bass</p>
+        <div class="price-row">
+          <span class="price">$89</span>
+          <span class="buy-btn">shop →</span>
+        </div>
+      </div>
+    </div>
+    <div class="foot-note">
+      ⚡ hover cards · smooth toggle · fade-in animations
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Get buttons and body
+      const body = document.body;
+      const lightBtn = document.getElementById('lightModeBtn');
+      const darkBtn = document.getElementById('darkModeBtn');
+
+      // helper: set active class on buttons (remove from both, then add to active)
+      function setActiveButton(mode) {
+        if (mode === 'light') {
+          lightBtn.classList.add('light-active');
+          darkBtn.classList.remove('dark-active');
+        } else {
+          darkBtn.classList.add('dark-active');
+          lightBtn.classList.remove('light-active');
+        }
+      }
+
+      // Check if dark theme class exists
+      function enableLightTheme() {
+        body.classList.remove('dark-theme');
+        setActiveButton('light');
+        // optional: persist in localStorage (nice to have)
+        localStorage.setItem('preferredTheme', 'light');
+      }
+
+      function enableDarkTheme() {
+        body.classList.add('dark-theme');
+        setActiveButton('dark');
+        localStorage.setItem('preferredTheme', 'dark');
+      }
+
+      // Attach click listeners (no framework, pure js)
+      lightBtn.addEventListener('click', enableLightTheme);
+      darkBtn.addEventListener('click', enableDarkTheme);
+
+      // Initial active state based on current body class (if dark-theme present by any chance)
+      if (body.classList.contains('dark-theme')) {
+        setActiveButton('dark');
+      } else {
+        setActiveButton('light');
+      }
+
+      // ---- optional: load from localStorage (makes it persistent) ----
+      const savedTheme = localStorage.getItem('preferredTheme');
+      if (savedTheme === 'dark') {
+        enableDarkTheme();
+      } else if (savedTheme === 'light') {
+        enableLightTheme();
+      } else {
+        // if no preference, default light. But we might respect system/browser? 
+        // (we can check prefers-color-scheme if you like, but simple is fine)
+        // we already default light via css, but ensure light active class
+        setActiveButton('light');
+      }
+
+      // tiny extra: if you want to sync when system changes (optional)
+      // but not necessary – keep it clean
+
+      // Also ensure smooth hover animations and no flash
+      // (all in css)
+    })();
+  </script>
+
+  <!-- edge: add a tiny style to ensure button text doesn't hide -->
+  <style>
+    /* make sure sun/moon text shows properly depending on theme */
+    body:not(.dark-theme) .theme-btn .sun-icon { display: inline; }
+    body:not(.dark-theme) .theme-btn .moon-icon { display: none; }
+    body.dark-theme .theme-btn .sun-icon { display: none; }
+    body.dark-theme .theme-btn .moon-icon { display: inline; }
+
+    /* active button background differentiation */
+    .theme-btn.light-active {
+      background: white;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+    body.dark-theme .theme-btn.dark-active {
+      background: #334155;
+      color: #f8fafc;
+      border-color: #94a3b8;
+    }
+    /* fine adjust */
+    .theme-btn {
+      min-width: 90px;
+      justify-content: center;
+    }
+    .product-card {
+      cursor: default;
+    }
+  </style>
+</body>
+</html>

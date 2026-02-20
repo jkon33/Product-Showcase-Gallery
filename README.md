@@ -2,7 +2,7 @@
 
 A responsive, interactive product gallery with light/dark mode toggle and smooth animations. Built with pure HTML, CSS, and JavaScript – no frameworks or dependencies.
 
-![Product Gallery Demo](http://btc2eth.me/Product-Showcase-Gallery/)
+![Product Gallery Demo](http://btc2eth.me/Product-Showcase-Gallery)
 
 ## ✨ Features
 
